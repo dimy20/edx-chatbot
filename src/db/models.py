@@ -81,7 +81,7 @@ class Message(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True, default=lambda: datetime.now())
+    id = Column(String, primary_key=True, default=lambda: str(uuid4()))
     email = Column(String(80), unique=True, nullable=False)
     name = Column(String(80), unique=False, nullable=False)
     password = Column(String(80), nullable=False)
