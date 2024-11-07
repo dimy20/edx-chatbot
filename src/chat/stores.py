@@ -11,3 +11,12 @@ pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"),
 index = pc.Index(os.getenv("PINECONE_INDEX_NAME"))
 
 vector_store = PineconeVectorStore(index=index, embedding=embeddings)
+
+
+def make_retriever(course_id: str):
+    search_kwargs = {
+        "filter" : {"course_id": course_id}
+    }
+    return vector_store.as_retriever(
+        search_kwargs=search_kwargs
+    )
