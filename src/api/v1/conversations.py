@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from db.models import Conversation, Course, User
 from db.db import get_db
 from typing import Optional
-from chat.chat import build_chat
+from chat.chat import init_chat
 
 
 router = APIRouter()
@@ -57,14 +57,19 @@ async def create_message(conversation_id : str,
         raise HTTPException(status_code=404, detail=f"user with id {message.user_id}, doesnt exist")
 
     course = conversation.course
-    build_chat(course.id)
-    # Build chat arguments
+    chat = init_chat(course.id, conversation_id)
     return {
-        "status" : "Success",
-        "message_added" : message.content,
-        "conversation" : conversation.as_dict(), 
+        "role" : "assistant",
+        "content" : chat.run(message.content)
     }
+    # Build chat arguments
+    #return {
+    #    "status" : "Success",
+    #    "message_added" : message.content,
+    #    "conversation" : conversation.as_dict(), 
+    #}
 
 @router.get("/")
 async def get_conversations(db : Session = Depends(get_db)):
+    print(type(db))
     return db.query(Conversation).all()

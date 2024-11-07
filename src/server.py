@@ -1,19 +1,7 @@
 
-from fastapi import FastAPI, Depends, HTTPException
-from dotenv import load_dotenv
-from uuid import uuid4
-from edx.edx import EdxClient, clean_overview
-from chat.chat import gen_overview_embeddings
-from db.db import init_db, SessionLocal
-from db import models
-
-from pydantic import BaseModel, EmailStr
-from sqlalchemy.orm import Session
-from typing import List, Optional
-
+from fastapi import FastAPI
+from db.db import init_db
 from api.v1 import users, conversations, courses
-
-import os
 
 
 init_db()
@@ -22,7 +10,7 @@ app = FastAPI()
 @app.get("/")
 async def index():
     return {
-        "first" : "Hello, World"
+        "data" : "asdasd"
     }
 
 app.include_router(users.router, prefix=users.PREFIX, tags=["users"])

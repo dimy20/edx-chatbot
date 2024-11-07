@@ -17,7 +17,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Function to initialize the database tables
 def init_db():
-    import models  # Import models to ensure they are registered with Base
     Base.metadata.create_all(bind=engine)
 
 
