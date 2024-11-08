@@ -2,7 +2,9 @@ from typing import List
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
-from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
+from langchain_openai.chat_models import ChatOpenAI
+#from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
+from chat.chains import StreamingConversationalRetrievalChain
 
 
 from chat.stores import vector_store, init_retriever
@@ -24,12 +26,15 @@ def gen_overview_embeddings(overview_text: str, course_id: str):
     
     return vector_store.add_documents(docs)
 
-def init_chat(course_id: str, conversation_id: str):
+def init_chat(course_id: str, conversation_id: str, streaming: bool):
     retriever = init_retriever(course_id)
-    llm = init_llm()
+    llm = init_llm(streaming)
+    condense_question_llm = ChatOpenAI(streaming=False)
     mem = init_memory(conversation_id)
-    return ConversationalRetrievalChain.from_llm(
+
+    return StreamingConversationalRetrievalChain.from_llm(
         llm=llm,
         memory=mem,
         retriever=retriever,
+        condense_question_llm=condense_question_llm
     )

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+from fastapi.responses import StreamingResponse
 
 from db.models import Conversation, Course, User
 from db.db import get_db
@@ -43,31 +44,30 @@ async def create_conversation(conversation: ConversationCreate, db : Session = D
 class MessageCreate(BaseModel):
     content: str
     user_id : str
+    streaming: bool | None = False
 
 @router.post("/{conversation_id}/messages")
 async def create_message(conversation_id : str, 
                          message: MessageCreate,
                          db : Session = Depends(get_db),
-                         conversation: Conversation = Depends(load_conversation),
-                         streaming: Optional[bool] = False):
-    
+                         conversation: Conversation = Depends(load_conversation)):
     #Provisorio, cambiar cuando tengamos login implementado
     user = db.query(User).filter(User.id == message.user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail=f"user with id {message.user_id}, doesnt exist")
 
+    streaming = message.streaming
     course = conversation.course
-    chat = init_chat(course.id, conversation_id)
-    return {
-        "role" : "assistant",
-        "content" : chat.run(message.content)
-    }
-    # Build chat arguments
-    #return {
-    #    "status" : "Success",
-    #    "message_added" : message.content,
-    #    "conversation" : conversation.as_dict(), 
-    #}
+    chat = init_chat(course.id, conversation_id, streaming=streaming)
+    print(streaming)
+
+    if streaming:
+        return StreamingResponse(chat.stream(message.content), media_type="application/json")
+    else:
+        return {
+            "role" : "assistant",
+            "content" : chat.run(message.content)
+        }
 
 @router.get("/")
 async def get_conversations(db : Session = Depends(get_db)):
