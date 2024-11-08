@@ -17,7 +17,7 @@ class EdxClient:
         self.courses_url = f"{self.base_url}/courses/v1/courses"
 
         self.headers = {
-            "Authorization": f"Bearer {self.access_token}",
+            #"Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json"
         }
 
@@ -27,6 +27,7 @@ class EdxClient:
             data = json.loads(res.content)
             return data["results"] if "results" in data else []
         else:
+            print(res.status_code)
             raise ValueError("Failed to get all courses")
 
     #No es la mejor forma de hacer esto pero bue

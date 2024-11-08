@@ -18,13 +18,12 @@ class UserCreate(BaseModel):
 class UserResponse(BaseModel):
     id: str
     email: EmailStr
-    courses: Optional[List[str]] = []  # List of course IDs
-    conversations: Optional[List[str]] = []  # List of conversation IDs
+    courses: Optional[List[str]] = [] 
+    conversations: Optional[List[str]] = []
 
     class Config:
         orm_mode = True
 
-# FastAPI endpoint to add a new user
 @router.post("/")
 async def add_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
