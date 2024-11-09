@@ -4,3 +4,4 @@ __pycache__
 .env
 uploaded_pdfs
 *.db
+node_modules
